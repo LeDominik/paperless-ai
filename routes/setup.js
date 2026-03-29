@@ -21,6 +21,7 @@ const { authenticateJWT, isAuthenticated } = require('./auth.js');
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const customService = require('../services/customService.js');
 const config = require('../config/config.js');
+const { basePath } = config;
 require('dotenv').config({ path: '../data/.env' });
 
 /**
@@ -158,7 +159,7 @@ router.use(async (req, res, next) => {
   } else {
     // Fallback to JWT authentication
     if (!token) {
-      return res.redirect('/login');
+      return res.redirect(`${basePath}/login`);
     }
 
     try {
@@ -166,7 +167,7 @@ router.use(async (req, res, next) => {
       req.user = decoded;
     } catch (error) {
       res.clearCookie('jwt');
-      return res.redirect('/login');
+      return res.redirect(`${basePath}/login`);
     }
   }
 
@@ -175,9 +176,9 @@ router.use(async (req, res, next) => {
     const isConfigured = await setupService.isConfigured();
  
     if (!isConfigured && (!process.env.PAPERLESS_AI_INITIAL_SETUP || process.env.PAPERLESS_AI_INITIAL_SETUP === 'no') && !req.path.startsWith('/setup')) {
-      return res.redirect('/setup');
+      return res.redirect(`${basePath}/setup`);
     } else if (!isConfigured && process.env.PAPERLESS_AI_INITIAL_SETUP === 'yes' && !req.path.startsWith('/settings')) {
-      return res.redirect('/settings');
+      return res.redirect(`${basePath}/settings`);
     }
   } catch (error) {
     console.error('Error checking setup configuration:', error);
@@ -245,9 +246,9 @@ router.get('/login', (req, res) => {
   //check if a user exists beforehand
   documentModel.getUsers().then((users) => {
     if(users.length === 0) {
-      res.redirect('setup');
+      res.redirect(`${basePath}/setup`);
     } else {
-      res.render('login', { error: null });
+      res.render('login', { error: null, basePath });
     }
   });
 });
@@ -340,7 +341,7 @@ router.post('/login', async (req, res) => {
     // Check if user was found and has required fields
     if (!user || !user.password) {
       console.log('[FAILED LOGIN] User not found or invalid data:', username);
-      return res.render('login', { error: 'Invalid credentials' });
+      return res.render('login', { error: 'Invalid credentials', basePath });
     }
 
     // Compare passwords
@@ -360,17 +361,17 @@ router.post('/login', async (req, res) => {
         httpOnly: true,
         secure: false,  
         sameSite: 'lax', 
-        path: '/',
+        path: basePath || '/',
         maxAge: 24 * 60 * 60 * 1000 
       });
 
-      return res.redirect('/dashboard');
+      return res.redirect(`${basePath}/dashboard`);
     }else{
-      return res.render('login', { error: 'Invalid credentials' });
+      return res.render('login', { error: 'Invalid credentials', basePath });
     }
   } catch (error) {
     console.error('Login error:', error);
-    res.render('login', { error: 'An error occurred during login' });
+    res.render('login', { error: 'An error occurred during login', basePath });
   }
 });
 
@@ -410,8 +411,8 @@ router.post('/login', async (req, res) => {
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/logout', (req, res) => {
-  res.clearCookie('jwt');
-  res.redirect('/login');
+  res.clearCookie('jwt', { path: basePath || '/' });
+  res.redirect(`${basePath}/login`);
 });
 
 /**
@@ -554,7 +555,8 @@ router.get('/playground', protectApiRoute, async (req, res) => {
       tagNames,
       correspondentNames,
       paperlessUrl,
-      version: configFile.PAPERLESS_AI_VERSION || ' '
+      version: configFile.PAPERLESS_AI_VERSION || ' ',
+      basePath
     });
   } catch (error) {
     console.error('[ERRO] loading documents view:', error);
@@ -702,7 +704,7 @@ router.get('/chat', async (req, res) => {
       const {open} = req.query;
       const documents = await paperlessService.getDocuments();
       const version = configFile.PAPERLESS_AI_VERSION || ' ';
-      res.render('chat', { documents, open, version });
+      res.render('chat', { documents, open, version, basePath });
   } catch (error) {
     console.error('[ERRO] loading documents:', error);
     res.status(500).send('Error loading documents');
@@ -1048,7 +1050,8 @@ router.get('/history', async (req, res) => {
       filters: {
         allTags: allTags,
         allCorrespondents: allCorrespondents
-      }
+      },
+      basePath
     });
   } catch (error) {
     console.error('[ERROR] loading history page:', error);
@@ -1944,19 +1947,21 @@ router.get('/setup', async (req, res) => {
     // If everything is configured and we have users, redirect to dashboard
     // BUT only after we've loaded all the config
     if (isFullyConfigured) {
-      return res.redirect('/dashboard');
+      return res.redirect(`${basePath}/dashboard`);
     }
 
     // Render setup page with config and appropriate message
     res.render('setup', {
       config,
-      success: successMessage
+      success: successMessage,
+      basePath
     });
   } catch (error) {
     console.error('Setup route error:', error);
     res.status(500).render('setup', {
       config: {},
-      error: 'An error occurred while loading the setup page.'
+      error: 'An error occurred while loading the setup page.',
+      basePath
     });
   }
 });
@@ -2117,7 +2122,8 @@ router.get('/manual', async (req, res) => {
     version,
     paperlessUrl: process.env.PAPERLESS_API_URL,
     paperlessToken: process.env.PAPERLESS_API_TOKEN,
-    config: {}
+    config: {},
+    basePath
   });
 });
 
@@ -2608,7 +2614,8 @@ router.get('/dashboard', async (req, res) => {
       averageTotalTokens, 
       tokensOverall 
     }, 
-    version 
+    version,
+    basePath
   });
 });
 
@@ -2736,7 +2743,8 @@ router.get('/settings', async (req, res) => {
     version,
     config,
     success: isConfigured ? 'The application is already configured. You can update the configuration below.' : undefined,
-    settingsError: showErrorCheckSettings ? 'Please check your settings. Something is not working correctly.' : undefined
+    settingsError: showErrorCheckSettings ? 'Please check your settings. Something is not working correctly.' : undefined,
+    basePath
   });
 });
 
@@ -2790,7 +2798,7 @@ router.get('/debug', async (req, res) => {
   //     message: 'Application setup not completed'
   //   });
   // }
-  res.render('debug');
+  res.render('debug', { basePath });
 });
 
 // router.get('/test/:correspondent', async (req, res) => {

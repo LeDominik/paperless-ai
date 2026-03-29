@@ -1,3 +1,4 @@
+const BASE_PATH = window.BASE_PATH || "";
 class ThemeManager {
     constructor() {
         this.themeToggle = document.getElementById('themeToggle');
@@ -894,7 +895,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             try {
                 const formData = new FormData(setupForm);
-                const response = await fetch('/setup', {
+                const response = await fetch(`${BASE_PATH}/setup`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -3,6 +3,7 @@
 <html lang="en" class="h-full" data-theme="light">
 <head>
     <meta charset="UTF-8">
+    <script>window.BASE_PATH = '<%- basePath %>';</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modified Documents - Paperless-AI</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
@@ -52,20 +53,20 @@
         <div id="sidebarOverlay" class="sidebar-overlay"></div>
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="/favicon.ico" class="no-invert" alt="Paperless AI Logo" style="height: 60px;">
+                <img src="<%- basePath %>/favicon.ico" class="no-invert" alt="Paperless AI Logo" style="height: 60px;">
                 <h1 class="brand-title">Paperless-AI<small style="display: block;"><%= version %></small></h1>
             </div>
 
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="/dashboard" class="sidebar-link"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-                    <li><a href="/manual" class="sidebar-link"><i class="fas fa-file-alt"></i><span>Manual</span></a></li>
-                    <li><a href="/chat" class="sidebar-link"><i class="fa-solid fa-comment"></i><span>Chat</span></a></li>
-                    <li><a href="/rag" class="sidebar-link"><i class="fa-solid fa-comment"></i><span>RAG Chat</span></a></li>
-                    <li><a href="/playground" class="sidebar-link"><i class="fa-solid fa-flask-vial"></i><span>Playground</span></a></li>
-                    <li><a href="/history" class="sidebar-link active"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></a></li>
-                    <li><a href="/settings" class="sidebar-link"><i class="fas fa-cog"></i><span>Settings</span></a></li>
-                    <li><a href="/logout" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a></li>
+                    <li><a href="<%- basePath %>/dashboard" class="sidebar-link"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                    <li><a href="<%- basePath %>/manual" class="sidebar-link"><i class="fas fa-file-alt"></i><span>Manual</span></a></li>
+                    <li><a href="<%- basePath %>/chat" class="sidebar-link"><i class="fa-solid fa-comment"></i><span>Chat</span></a></li>
+                    <li><a href="<%- basePath %>/rag" class="sidebar-link"><i class="fa-solid fa-comment"></i><span>RAG Chat</span></a></li>
+                    <li><a href="<%- basePath %>/playground" class="sidebar-link"><i class="fa-solid fa-flask-vial"></i><span>Playground</span></a></li>
+                    <li><a href="<%- basePath %>/history" class="sidebar-link active"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></a></li>
+                    <li><a href="<%- basePath %>/settings" class="sidebar-link"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+                    <li><a href="<%- basePath %>/logout" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a></li>
                 </ul>
                 <a href="https://github.com/clusterzx/paperless-ai" 
                 class="github-button" 

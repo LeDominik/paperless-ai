@@ -1,3 +1,4 @@
+const BASE_PATH = window.BASE_PATH || "";
 // Prompt Rating System and Analyzer combined in one file
 class PromptRatingSystem {
     constructor() {
@@ -590,7 +591,7 @@ class PlaygroundAnalyzer {
 
         try {
             // Dokument-Content abrufen
-            const contentResponse = await fetch(`/manual/preview/${docId}`);
+            const contentResponse = await fetch(`${BASE_PATH}/manual/preview/${docId}`);
             if (!contentResponse.ok) throw new Error('Failed to fetch document content');
             const contentData = await contentResponse.json();
 
@@ -605,7 +606,7 @@ class PlaygroundAnalyzer {
             const existingTitle = docCard.querySelector('h3').textContent;
 
             // Analyse durchführen
-            const analysisResponse = await fetch('/manual/playground', {
+            const analysisResponse = await fetch(`${BASE_PATH}/manual/playground`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

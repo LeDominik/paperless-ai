@@ -1,3 +1,4 @@
+const BASE_PATH = window.BASE_PATH || "";
 //settings.js
 // Theme Management
 class ThemeManager {
@@ -477,7 +478,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             if (formData.get('systemPrompt')) {
                 formData.set('systemPrompt', formData.get('systemPrompt').replace(/`/g, ''));
             }
-            const response = await fetch('/settings', {
+            const response = await fetch(`${BASE_PATH}/settings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

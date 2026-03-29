@@ -64,7 +64,7 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(config.basePath || '/', express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
 // Swagger documentation route
@@ -431,19 +431,21 @@ async function scanDocuments() {
 }
 
 // Routes
-app.use('/', setupRoutes);
+const { basePath } = config;
+app.use(basePath || '/', setupRoutes);
 const authRoutes = require('./routes/auth');
 const ragRoutes = require('./routes/rag');
 
 // Mount RAG routes if enabled
 if (process.env.RAG_SERVICE_ENABLED === 'true') {
-  app.use('/api/rag', ragRoutes);
+  app.use(`${basePath}/api/rag`, ragRoutes);
   
   // RAG UI route
-  app.get('/rag', async (req, res) => {
+  app.get(`${basePath}/rag`, async (req, res) => {
     try {
       res.render('rag', { 
-        title: 'Dokumenten-Fragen'
+        title: 'Dokumenten-Fragen',
+        basePath
       });
     } catch (error) {
       console.error('Error rendering RAG UI:', error);
@@ -477,9 +479,9 @@ if (process.env.RAG_SERVICE_ENABLED === 'true') {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-app.get('/', async (req, res) => {
+app.get(basePath || '/', async (req, res) => {
   try {
-    res.redirect('/dashboard');
+    res.redirect(`${basePath}/dashboard`);
   } catch (error) {
     console.error('[ERROR] in root route:', error);
     res.status(500).send('Error processing request');

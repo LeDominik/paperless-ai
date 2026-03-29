@@ -1,3 +1,4 @@
+const BASE_PATH = window.BASE_PATH || "";
 // Theme Management
 class ThemeManager {
     constructor() {
@@ -137,7 +138,7 @@ window.showTagDetails = async function() {
     window.modalManager.showLoader();
 
     try {
-        const response = await fetch('/api/tagsCount');
+        const response = await fetch(`${BASE_PATH}/api/tagsCount`);
         const tags = await response.json();
 
         let content = '<div class="detail-list">';
@@ -165,7 +166,7 @@ window.showCorrespondentDetails = async function() {
     window.modalManager.showLoader();
 
     try {
-        const response = await fetch('/api/correspondentsCount');
+        const response = await fetch(`${BASE_PATH}/api/correspondentsCount`);
         const correspondents = await response.json();
 
         let content = '<div class="detail-list">';
@@ -221,7 +222,7 @@ async function showTagDetails() {
     modalManager.showLoader();
 
     try {
-        const response = await fetch('/api/tags');
+        const response = await fetch(`${BASE_PATH}/api/tags`);
         const tags = await response.json();
 
         let content = '<div class="detail-list">';
@@ -249,7 +250,7 @@ async function showCorrespondentDetails() {
     modalManager.showLoader();
 
     try {
-        const response = await fetch('/api/correspondents');
+        const response = await fetch(`${BASE_PATH}/api/correspondents`);
         const correspondents = await response.json();
 
         let content = '<div class="detail-list">';

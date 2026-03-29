@@ -76,6 +76,26 @@ Powered by **Retrieval-Augmented Generation (RAG)**, you can now search semantic
 
 ---
 
+## 🔀 Reverse Proxy Subpath Support
+
+If you want to run paperless-ai under a subpath (e.g. `https://yourdomain.com/ai/`) behind a reverse proxy like Caddy or nginx, set the `BASE_PATH` environment variable:
+
+```yaml
+environment:
+  - BASE_PATH=/ai
+```
+
+Caddy example:
+```caddyfile
+handle_path /ai/* {
+    reverse_proxy paperless-ai:3000
+}
+```
+
+The default value is `/` which means no subpath (standard behaviour).
+
+---
+
 ## 🔧 Local Development
 
 ```bash

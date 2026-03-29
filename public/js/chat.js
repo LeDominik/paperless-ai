@@ -1,3 +1,4 @@
+const BASE_PATH = window.BASE_PATH || "";
 let currentDocumentId = null;
 
 // Initialize marked with options for code highlighting
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initializeChat(documentId) {
     try {
-        const response = await fetch(`/chat/init/${documentId}`);
+        const response = await fetch(`${BASE_PATH}/chat/init/${documentId}`);
         if (!response.ok) throw new Error('Failed to initialize chat');
         const data = await response.json();
         
@@ -42,7 +43,7 @@ async function initializeChat(documentId) {
 
 async function sendMessage(message) {
     try {
-        const response = await fetch('/chat/message', {
+        const response = await fetch(`${BASE_PATH}/chat/message`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

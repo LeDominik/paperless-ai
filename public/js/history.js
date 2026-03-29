@@ -1,3 +1,4 @@
+const BASE_PATH = window.BASE_PATH || "";
 // Theme Management
 class ThemeManager {
     constructor() {
@@ -261,7 +262,7 @@ class HistoryManager {
 
     async resetDocuments(ids) {
         try {
-            const response = await fetch('/api/reset-documents', {
+            const response = await fetch(`${BASE_PATH}/api/reset-documents`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ids })
@@ -282,7 +283,7 @@ class HistoryManager {
 
     async resetAllDocuments() {
         try {
-            const response = await fetch('/api/reset-all-documents', {
+            const response = await fetch(`${BASE_PATH}/api/reset-all-documents`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });

@@ -4,6 +4,10 @@ const envPath = path.join(currentDir, 'data', '.env');
 console.log('Loading .env from:', envPath); // Debug log
 require('dotenv').config({ path: envPath });
 
+// Normalize BASE_PATH: '/' is the default (intuitive for end users), internally always '' or '/subpath'
+const rawBasePath = process.env.BASE_PATH || '/';
+const basePath = rawBasePath === '/' ? '' : '/' + rawBasePath.replace(/^\/|\/$/g, '');
+
 // Helper function to parse boolean-like env vars
 const parseEnvBoolean = (value, defaultValue = 'yes') => {
   if (!value) return defaultValue;
@@ -88,6 +92,7 @@ module.exports = {
     deploymentName: process.env.AZURE_DEPLOYMENT_NAME || '',
     apiVersion: process.env.AZURE_API_VERSION || '2023-05-15'
   },
+  basePath: basePath,
   customFields: process.env.CUSTOM_FIELDS || '',
   aiProvider: process.env.AI_PROVIDER || 'openai',
   scanInterval: process.env.SCAN_INTERVAL || '*/30 * * * *',
