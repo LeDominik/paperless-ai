@@ -5,11 +5,15 @@ const path = require('path');
 // Map non-OpenAI models to compatible OpenAI encodings or use estimation
 function getCompatibleModel(model) {
     const openaiModels = [
+        // GPT-5 family (tiktoken may not have encodings yet — the try/catch
+        // in calculateTokens falls back to char-based estimation if so)
+        'gpt-5', 'gpt-5-mini', 'gpt-5-nano',
+
         // GPT-4o family
         'gpt-4o', 'chatgpt-4o-latest', 'gpt-4o-mini', 'gpt-4o-audio-preview',
         'gpt-4o-audio-preview-2024-12-17', 'gpt-4o-audio-preview-2024-10-01',
         'gpt-4o-mini-audio-preview', 'gpt-4o-mini-audio-preview-2024-12-17',
-        
+
         // GPT-4.1 family
         'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
         
