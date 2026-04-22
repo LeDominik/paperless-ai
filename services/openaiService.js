@@ -12,6 +12,15 @@ const path = require('path');
 const { model } = require('./ollamaService');
 const RestrictionPromptService = require('./restrictionPromptService');
 
+// GPT-5 family and the o-series reasoning models (o1/o3/o4) reject
+// custom `temperature` values — only the default (1) is supported.
+// Older chat models accept the usual 0–2 range. Return false for the
+// reasoning-model families so the temperature key is omitted entirely.
+function supportsCustomTemperature(model) {
+  if (!model) return true;
+  return !/^(gpt-5|o1|o3|o4)/.test(model);
+}
+
 class OpenAIService {
   constructor() {
     this.client = null;
@@ -187,7 +196,7 @@ class OpenAIService {
             content: truncatedContent
           }
         ],
-        ...(model !== 'o3-mini' && { temperature: 0.3 }),
+        ...(supportsCustomTemperature(model) && { temperature: 0.3 }),
       });
 
       if (!response?.choices?.[0]?.message?.content) {
@@ -311,7 +320,7 @@ class OpenAIService {
             content: truncatedContent
           }
         ],
-        ...(model !== 'o3-mini' && { temperature: 0.3 }),
+        ...(supportsCustomTemperature(model) && { temperature: 0.3 }),
       });
 
       // Handle response
@@ -384,7 +393,7 @@ class OpenAIService {
             content: prompt
           }
         ],
-        temperature: 0.7
+        ...(supportsCustomTemperature(model) && { temperature: 0.7 }),
       });
 
       if (!response?.choices?.[0]?.message?.content) {
@@ -414,7 +423,7 @@ class OpenAIService {
             content: "Test"
           }
         ],
-        temperature: 0.7
+        ...(supportsCustomTemperature(process.env.OPENAI_MODEL) && { temperature: 0.7 }),
       });
       if (!response?.choices?.[0]?.message?.content) {
         throw new Error('Invalid API response structure');
