@@ -629,11 +629,12 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 // Start server
 async function startServer() {
   const port = process.env.PAPERLESS_AI_PORT || 3000;
+  const host = process.env.PAPERLESS_AI_HOST || '127.0.0.1';
   try {
     await initializeDataDirectory();
     await saveOpenApiSpec(); // Save OpenAPI specification on startup
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
+    app.listen(port, host, () => {
+      console.log(`Server running on http://${host}:${port}`);
       startScanning();
     });
   } catch (error) {

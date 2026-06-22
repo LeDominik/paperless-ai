@@ -9,6 +9,7 @@ class SetupService {
   constructor() {
     this.envPath = path.join(process.cwd(), 'data', '.env');
     this.configured = null; // Variable to store the configuration status
+    this.lastValidationError = null;
   }
 
   async loadConfig() {
@@ -67,24 +68,52 @@ class SetupService {
 
 
   async validateOpenAIConfig(apiKey) {
+    this.lastValidationError = null;
     if (config.CONFIGURED === false) {
       try {
-        const openai = new OpenAI({ apiKey });
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [{ role: "user", content: "Test" }],
+        const response = await fetch('https://api.openai.com/v1/models', {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+          },
         });
         const now = new Date();
         const timestamp = now.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
-        console.log(`[DEBUG] [${timestamp}] OpenAI request sent`);
-        return response.choices && response.choices.length > 0;
+        console.log(`[DEBUG] [${timestamp}] OpenAI key validation request sent`);
+        if (response.ok) return true;
+
+        const errorBody = await response.json().catch(() => ({}));
+        const error = new Error(errorBody?.error?.message || response.statusText);
+        error.status = response.status;
+        error.code = errorBody?.error?.code;
+        error.error = errorBody?.error;
+        throw error;
       } catch (error) {
         console.error('OpenAI validation error:', error.message);
+        const errorCode = error.code || error.error?.code;
+        if (error.status === 429 && errorCode === 'insufficient_quota') {
+          this.lastValidationError = 'OpenAI API key authenticated, but the account has insufficient quota/billing. Configuration can be saved, but document processing will fail until quota is fixed.';
+          console.warn(this.lastValidationError);
+          return true;
+        }
+        if (error.status === 429) {
+          this.lastValidationError = 'OpenAI API key authenticated, but OpenAI is currently rate-limiting requests. Try again later.';
+          console.warn(this.lastValidationError);
+          return true;
+        }
+        if (error.status === 401) {
+          this.lastValidationError = 'OpenAI API key was rejected by OpenAI.';
+        } else {
+          this.lastValidationError = `OpenAI validation failed: ${error.message}`;
+        }
         return false;
       }
     }else{
       return true;
     }
+  }
+
+  getLastValidationError() {
+    return this.lastValidationError;
   }
 
   async validateCustomConfig(url, apiKey, model) {

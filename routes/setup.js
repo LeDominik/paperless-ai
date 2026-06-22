@@ -3755,8 +3755,8 @@ router.post('/setup', express.json(), async (req, res) => {
     if (aiProvider === 'openai') {
       const isOpenAIValid = await setupService.validateOpenAIConfig(openaiKey);
       if (!isOpenAIValid) {
-        return res.status(400).json({ 
-          error: 'OpenAI API Key is not valid. Please check the key.'
+        return res.status(400).json({
+          error: setupService.getLastValidationError() || 'OpenAI API key was rejected by OpenAI. Please check the key.'
         });
       }
       config.OPENAI_API_KEY = openaiKey;
@@ -4160,8 +4160,8 @@ router.post('/settings', express.json(), async (req, res) => {
       if (aiProvider === 'openai' && openaiKey) {
         const isOpenAIValid = await setupService.validateOpenAIConfig(openaiKey);
         if (!isOpenAIValid) {
-          return res.status(400).json({ 
-            error: 'OpenAI API Key is not valid. Please check the key.'
+          return res.status(400).json({
+            error: setupService.getLastValidationError() || 'OpenAI API key was rejected by OpenAI. Please check the key.'
           });
         }
         updatedConfig.OPENAI_API_KEY = openaiKey;
